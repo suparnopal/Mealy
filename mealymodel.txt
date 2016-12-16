@@ -1,0 +1,29 @@
+
+module MealyModel(output C,A,D,Qa,Qb,input x,y,clock,reset); 
+wire Jb,Kb,Ja,Ka;
+assign Jb=Qa&(~x)&y; // Input equation for ‘JB’
+assign Kb=(~Qa)&x; // Input equation for ‘KB’
+assign Ja=((~x)&y)|(Qb&x); // Input equation for ‘JA’
+assign Ka=x|((~Qb)&y); // Input equation for ‘KA’
+assign C=(~x&((~y)|(Qb&Qa)))|(~Qb&~Qa&x); // Output equations
+assign A=(~x)&y&(~(Qb&Qa));
+assign D=x&(Qa|Qb);
+JKFlipFlop JK2(Qb,Jb,Kb,clock,reset);  // Instantiating the JK Flip Flop for B(MSB)
+JKFlipFlop JK1(Qa,Ja,Ka,clock,reset);  // Instantiating the JK Flip Flop for A(LSB) 
+endmodule
+
+
+
+module JKFlipFlop(output Q,input J,K,clock,reset); // JK Flip Flop from D Flip Flop 
+wire JK;
+assign JK=(J&~Q)|(~K&Q);
+DFlipFlop jk(Q,JK,clock,reset); // Instantiating the D Flip Flop
+endmodule
+
+
+
+module DFlipFlop(output reg Q,input d,clock,reset); // D Flip Flop
+always@(posedge clock,negedge reset)
+if(!reset) Q<=1'b0;
+else Q<=d;
+endmodule
